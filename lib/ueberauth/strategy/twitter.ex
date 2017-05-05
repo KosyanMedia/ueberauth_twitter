@@ -32,6 +32,17 @@ defmodule Ueberauth.Strategy.Twitter do
     end
   end
 
+  @doc """
+  Handles the callback from app.
+  """
+  def handle_callback!(%Plug.Conn{params: %{"oauth_token" => oauth_token, "oauth_token_secret" => oauth_token_secret}} = conn) do
+    token = {oauth_token, oauth_token_secret}
+    conn
+    |> fetch_session
+    |> put_session(:twitter_token, token)
+    |> fetch_user(token)
+  end
+
   @doc false
   def handle_callback!(conn) do
     set_errors!(conn, [error("missing_code", "No code received")])
